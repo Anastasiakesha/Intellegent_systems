@@ -14,7 +14,9 @@ public class Patient {
     private boolean highSugar;
     private boolean lowSugar;
     private boolean numbness;
-    private boolean familyHistory;
+    private boolean injectionSiteProblems;
+    private boolean nightSweats;
+    private boolean rapidHeartbeat;
 
     // Гипогликемия
     private boolean dizziness;
@@ -28,12 +30,6 @@ public class Patient {
     private boolean lateEating;
     private boolean irregularEating;
 
-    // Инсулин и терапия
-    private boolean incorrectInsulinDose;
-    private boolean missedInsulin;
-    private boolean pumpIssues;
-    private boolean injectionSiteProblems;
-
     // Диабетические осложнения
     private boolean neuropathyPain;
     private boolean footUlcers;
@@ -46,10 +42,7 @@ public class Patient {
     // Гестационный диабет
     private Integer pregnancyWeek;
     private boolean fetalGrowthIssues;
-    private boolean highBloodPressurePregnancy;
     private boolean proteinInUrine;
-    private boolean nightSweats;
-    private boolean rapidHeartbeat;
 
     public Patient() {}
 
@@ -80,9 +73,6 @@ public class Patient {
     public Boolean getLowSugar() { return lowSugar;}
     public void setLowSugar(boolean selected) { this.lowSugar = lowSugar; }
 
-    public Boolean getFamilyHistory() { return familyHistory; }
-    public void setFamilyHistory(Boolean familyHistory) { this.familyHistory = familyHistory; }
-
     public Boolean getNumbness() { return numbness; }
     public void setNumbness(Boolean numbness) { this.numbness = numbness; }
 
@@ -109,15 +99,6 @@ public class Patient {
 
     public Boolean getIrregularEating() { return irregularEating; }
     public void setIrregularEating(Boolean irregularEating) { this.irregularEating = irregularEating; }
-
-    public Boolean getIncorrectInsulinDose() { return incorrectInsulinDose; }
-    public void setIncorrectInsulinDose(Boolean incorrectInsulinDose) { this.incorrectInsulinDose = incorrectInsulinDose; }
-
-    public Boolean getMissedInsulin() { return missedInsulin; }
-    public void setMissedInsulin(Boolean missedInsulin) { this.missedInsulin = missedInsulin; }
-
-    public Boolean getPumpIssues() { return pumpIssues; }
-    public void setPumpIssues(Boolean pumpIssues) { this.pumpIssues = pumpIssues; }
 
     public Boolean getInjectionSiteProblems() { return injectionSiteProblems; }
     public void setInjectionSiteProblems(Boolean injectionSiteProblems) { this.injectionSiteProblems = injectionSiteProblems; }
@@ -148,9 +129,6 @@ public class Patient {
 
     public Boolean getFetalGrowthIssues() { return fetalGrowthIssues; }
     public void setFetalGrowthIssues(Boolean fetalGrowthIssues) { this.fetalGrowthIssues = fetalGrowthIssues; }
-
-    public Boolean getHighBloodPressurePregnancy() { return highBloodPressurePregnancy; }
-    public void setHighBloodPressurePregnancy(Boolean highBloodPressurePregnancy) { this.highBloodPressurePregnancy = highBloodPressurePregnancy; }
 
     public Boolean getProteinInUrine() { return proteinInUrine; }
     public void setProteinInUrine(Boolean proteinInUrine) { this.proteinInUrine = proteinInUrine; }

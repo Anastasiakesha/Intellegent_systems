@@ -31,10 +31,12 @@ public class DiabetesGUI extends Application {
         // -------------------- ОСНОВНЫЕ ДАННЫЕ --------------------
         grid.add(new Label("Возраст:"), 0, row);
         TextField ageField = new TextField();
+        allowOnlyInteger(ageField);
         grid.add(ageField, 1, row++);
 
         grid.add(new Label("BMI:"), 0, row);
         TextField bmiField = new TextField();
+        allowOnlyDouble(bmiField);
         grid.add(bmiField, 1, row++);
 
         grid.add(new Separator(), 0, row++, 2, 1);
@@ -60,6 +62,7 @@ public class DiabetesGUI extends Application {
         CheckBox numbnessCheck = new CheckBox("Онемение");
         CheckBox nightSweatsCheck = new CheckBox("Ночная потливость");
         CheckBox rapidHeartbeatCheck = new CheckBox("Учащённое сердцебиение");
+        CheckBox injectionSiteProblemsCheck = new CheckBox("Проблемы места инъекции");
 
         grid.add(thirstCheck, 0, row);
         grid.add(urinationCheck, 1, row++);
@@ -70,6 +73,7 @@ public class DiabetesGUI extends Application {
         grid.add(numbnessCheck, 0, row);
         grid.add(nightSweatsCheck, 1, row++);
         grid.add(rapidHeartbeatCheck, 0, row);
+        grid.add(injectionSiteProblemsCheck, 1, row++);
         row++;
         grid.add(new Separator(), 0, row++, 2, 1);
 
@@ -103,20 +107,6 @@ public class DiabetesGUI extends Application {
 
         grid.add(new Separator(), 0, row++, 2, 1);
 
-        // -------------------- ИНСУЛИН --------------------
-        grid.add(new Label("Инсулиновая терапия:"), 0, row++);
-
-        CheckBox incorrectInsulinDoseCheck = new CheckBox("Неверная дозировка");
-        CheckBox missedInsulinCheck = new CheckBox("Пропуск инсулина");
-        CheckBox pumpIssuesCheck = new CheckBox("Проблемы помпы");
-        CheckBox injectionSiteProblemsCheck = new CheckBox("Проблемы места инъекции");
-
-        grid.add(incorrectInsulinDoseCheck, 0, row);
-        grid.add(missedInsulinCheck, 1, row++);
-        grid.add(pumpIssuesCheck, 0, row);
-        grid.add(injectionSiteProblemsCheck, 1, row++);
-
-        grid.add(new Separator(), 0, row++, 2, 1);
 
         // -------------------- ОСЛОЖНЕНИЯ --------------------
         grid.add(new Label("Осложнения:"), 0, row++);
@@ -142,8 +132,8 @@ public class DiabetesGUI extends Application {
         // -------------------- ГЕСТАЦИОННЫЙ ДИАБЕТ (динамические поля) --------------------
         Label gestationalLabel = new Label("Гестационный диабет:");
         TextField pregnancyWeekField = new TextField();
+        allowOnlyInteger(pregnancyWeekField);
         CheckBox fetalGrowthIssuesCheck = new CheckBox("Проблемы роста плода");
-        CheckBox highBPpregCheck = new CheckBox("Гипертензия беременных");
         CheckBox proteinUrineCheck = new CheckBox("Белок в моче");
 
         // Добавляем на сетку, но скрываем по умолчанию
@@ -152,8 +142,7 @@ public class DiabetesGUI extends Application {
         grid.add(pregnancyWeekLabel, 0, row);
         grid.add(pregnancyWeekField, 1, row++);
         grid.add(fetalGrowthIssuesCheck, 0, row);
-        grid.add(highBPpregCheck, 1, row++);
-        grid.add(proteinUrineCheck, 0, row++);
+        grid.add(proteinUrineCheck, 1, row++);
         grid.add(new Separator(), 0, row++, 2, 1);
 
         // Скрытие по умолчанию
@@ -165,10 +154,21 @@ public class DiabetesGUI extends Application {
         pregnancyWeekField.setManaged(false);
         fetalGrowthIssuesCheck.setVisible(false);
         fetalGrowthIssuesCheck.setManaged(false);
-        highBPpregCheck.setVisible(false);
-        highBPpregCheck.setManaged(false);
         proteinUrineCheck.setVisible(false);
         proteinUrineCheck.setManaged(false);
+
+        // -------------------- ВЗАИМОИСКЛЮЧЕНИЕ САХАРА --------------------
+        highSugarCheck.setOnAction(e -> {
+            if (highSugarCheck.isSelected() && lowSugarCheck.isSelected()) {
+                showSugarConflictAlert();
+            }
+        });
+
+        lowSugarCheck.setOnAction(e -> {
+            if (lowSugarCheck.isSelected() && highSugarCheck.isSelected()) {
+                showSugarConflictAlert();
+            }
+        });
 
         // -------------------- КНОПКА --------------------
         Button checkBtn = new Button("Проверить");
@@ -204,8 +204,6 @@ public class DiabetesGUI extends Application {
             pregnancyWeekField.setManaged(showGestational);
             fetalGrowthIssuesCheck.setVisible(showGestational);
             fetalGrowthIssuesCheck.setManaged(showGestational);
-            highBPpregCheck.setVisible(showGestational);
-            highBPpregCheck.setManaged(showGestational);
             proteinUrineCheck.setVisible(showGestational);
             proteinUrineCheck.setManaged(showGestational);
         });
@@ -238,6 +236,7 @@ public class DiabetesGUI extends Application {
             patient.setNumbness(numbnessCheck.isSelected());
             patient.setNightSweats(nightSweatsCheck.isSelected());
             patient.setRapidHeartbeat(rapidHeartbeatCheck.isSelected());
+            patient.setInjectionSiteProblems(injectionSiteProblemsCheck.isSelected());
 
             patient.setDizziness(dizzinessCheck.isSelected());
             patient.setSweating(sweatingCheck.isSelected());
@@ -249,10 +248,6 @@ public class DiabetesGUI extends Application {
             patient.setLateEating(lateEatingCheck.isSelected());
             patient.setIrregularEating(irregularEatingCheck.isSelected());
 
-            patient.setIncorrectInsulinDose(incorrectInsulinDoseCheck.isSelected());
-            patient.setMissedInsulin(missedInsulinCheck.isSelected());
-            patient.setPumpIssues(pumpIssuesCheck.isSelected());
-            patient.setInjectionSiteProblems(injectionSiteProblemsCheck.isSelected());
 
             patient.setNeuropathyPain(neuropathyPainCheck.isSelected());
             patient.setFootUlcers(footUlcersCheck.isSelected());
@@ -271,7 +266,6 @@ public class DiabetesGUI extends Application {
                 }
             }
             patient.setFetalGrowthIssues(fetalGrowthIssuesCheck.isSelected());
-            patient.setHighBloodPressurePregnancy(highBPpregCheck.isSelected());
             patient.setProteinInUrine(proteinUrineCheck.isSelected());
 
             patient.setDiabetesType(diabetesTypeCombo.getValue());
@@ -294,6 +288,8 @@ public class DiabetesGUI extends Application {
                     session.getObjects(o -> o instanceof Conclusion)
                             .stream().map(o -> (Conclusion) o).toList();
 
+
+
             session.dispose();
 
             rulesArea.setText(String.join("\n", firedRules));
@@ -301,6 +297,8 @@ public class DiabetesGUI extends Application {
             StringBuilder sb = new StringBuilder();
             for (Conclusion c : conclusions) sb.append(c.getMessage()).append("\n");
             conclusionsArea.setText(sb.toString());
+
+
         });
 
         // ScrollPane для формы
@@ -323,5 +321,37 @@ public class DiabetesGUI extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
+    }
+
+    private void allowOnlyInteger(TextField textField) {
+        TextFormatter<String> formatter = new TextFormatter<>(change -> {
+            if (change.getControlNewText().matches("\\d*")) {
+                return change;
+            }
+            return null;
+        });
+        textField.setTextFormatter(formatter);
+    }
+
+    private void allowOnlyDouble(TextField textField) {
+        TextFormatter<String> formatter = new TextFormatter<>(change -> {
+            String newText = change.getControlNewText();
+            if (newText.matches("\\d*(\\.\\d*)?")) {
+                return change;
+            }
+            return null;
+        });
+        textField.setTextFormatter(formatter);
+    }
+
+    private void showSugarConflictAlert() {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Ошибка ввода данных");
+        alert.setHeaderText("Противоречивые данные");
+        alert.setContentText(
+                "Невозможно одновременно выбрать высокий и низкий уровень сахара.\n\n" +
+                        "Пожалуйста, уточните состояние пациента."
+        );
+        alert.showAndWait();
     }
 }

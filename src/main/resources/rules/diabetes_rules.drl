@@ -3,366 +3,482 @@ package rules
 import com.diabetes.facts.Patient;
 import com.diabetes.facts.Conclusion;
 
-rule "Possible Hyperglycemia"
+/* Общие правила, которые связаны с осложнениями всех типов сахарного диабета */ 
+rule "1. Hidden Hyperglycemia Pattern"
 when
-    $p : Patient(fatigue == true, frequentUrination == true)
+    $p : Patient(fatigue == true, blurredVision == true, slowHealing == true, thirst == false)
 then
-    insert(new Conclusion("Пациент может испытывать гипергликемию — проверьте уровень глюкозы и корректность терапии."));
-    insert("HYPER");
-    System.out.println("RULE FIRED: Possible Hyperglycemia");
+    insert(new Conclusion(
+        "Вероятна хроническая скрытая гипергликемия без выраженной жажды."
+    ));
+    System.out.println("RULE FIRED: 1. Hidden Hyperglycemia Pattern");
 end
 
-rule "Vision Complications Risk"
+rule "2. Vision Complications Risk"
 when
     $p : Patient(blurredVision == true, highSugar == true)
 then
     insert(new Conclusion("Возможны осложнения на сетчатке — направить к офтальмологу."));
-    insert("COMPL");
-    System.out.println("RULE FIRED: Vision Complications Risk");
+    System.out.println("RULE FIRED: 2. Vision Complications Risk");
 end
 
-rule "Neuropathy Risk"
+rule "3. Neuropathy Risk"
 when
     $p : Patient(numbness == true, fatigue == true)
 then
     insert(new Conclusion("Симптомы соответствуют нейропатии — требуется неврологическая оценка и скрининг невропатии."));
-    insert("COMPL");
-    System.out.println("RULE FIRED: Neuropathy Risk");
+    System.out.println("RULE FIRED: 3. Neuropathy Risk");
 end
 
-rule "Dehydration Risk"
+rule "4. Dehydration Risk"
 when
     $p : Patient(frequentUrination == true, thirst == true)
 then
     insert(new Conclusion("Вероятна дегидратация — рекомендовано восполнение жидкости и мониторинг электролитов."));
-    insert("COMPL");
-    System.out.println("RULE FIRED: Dehydration Risk");
+    System.out.println("RULE FIRED: 4. Dehydration Risk");
 end
 
-rule "Cardiovascular Risk"
+rule "5. Cardiovascular Risk"
 when
-    $p : Patient(bmi > 30, fatigue == true)
+    $p : Patient(bmi > 28, fatigue == true)
 then
     insert(new Conclusion("Рекомендуется оценка сердечно-сосудистой системы (ЭКГ, липиды)."));
-    insert("COMPL");
-    System.out.println("RULE FIRED: Cardiovascular Risk");
+    System.out.println("RULE FIRED: 5. Cardiovascular Risk");
 end
 
-rule "Combined Complications Risk"
+rule "6. Combined Complications Risk"
 when
     $p : Patient(blurredVision == true, numbness == true)
 then
     insert(new Conclusion("Комбинация зрительных и нервных симптомов указывает на мультиорганные осложнения — комплексная диагностика необходима."));
-    insert("COMPL");
-    System.out.println("RULE FIRED: Combined Complications Risk");
+    System.out.println("RULE FIRED: 6. Combined Complications Risk");
 end
 
-rule "Difficulty Managing Diabetes"
+rule "7. Nocturnal Hypoglycemia Suspected"
 when
-    $p : Patient(familyHistory == true, highSugar == true)
+    $p : Patient(nightSweats == true, fatigue == true, hunger == true, dizziness == false)
 then
-    insert(new Conclusion("Трудности в контроле диабета — рассмотрите индивидуальную терапию и обучение самоконтролю."));
-    insert("COMPL");
-    System.out.println("RULE FIRED: Difficulty Managing Diabetes");
+    insert(new Conclusion(
+        "Возможна ночная гипогликемия с компенсаторным утренним истощением."));
+    System.out.println("RULE FIRED: 7. Nocturnal Hypoglycemia Suspected");
 end
 
-rule "Unexpected Treatment Response"
+rule "8. Unexpected Treatment Response"
 when
-    $p : Patient(fatigue == true, highSugar == true, bmi < 25)
+    $p : Patient(fatigue == true, highSugar == true, bmi >= 18.5 && bmi <= 25)
 then
-    insert(new Conclusion("Высокий сахар при нормальном/низком BMI — проверить дозировки, соответствие терапии и возможность LADA."));
-    insert("HYPER");
-    System.out.println("RULE FIRED: Unexpected Treatment Response");
+    insert(new Conclusion("Высокий сахар при нормальном/низком BMI — проверить дозировки, соответствие терапии"));
+    System.out.println("RULE FIRED: 8. Unexpected Treatment Response");
 end
 
-rule "Multi-organ Risk"
+rule "9. Glycemic Variability Syndrome"
 when
-    $p : Patient(numbness == true, blurredVision == true, highSugar == true)
+    Patient(fatigue == true, rapidHeartbeat == true, confusion == true, sweating == false)
 then
-    insert(new Conclusion("Наличие поражений нервной и зрительной систем при высоком сахаре — срочная комплексная оценка необходима."));
-    insert("COMPL");
-    System.out.println("RULE FIRED: Multi-organ Risk");
+    insert(new Conclusion(
+        "Вероятны резкие колебания уровня глюкозы без типичных признаков гипо."
+    ));
+    System.out.println("RULE FIRED: 9. Glycemic Variability Syndrome");
 end
 
-rule "Metabolic Complications"
-when
-    $p : Patient(bmi > 30, fatigue == true, thirst == true)
-then
-    insert(new Conclusion("Рассмотреть пересмотр диеты, физической активности и терапии — возможны метаболические осложнения."));
-    insert("COMPL");
-    System.out.println("RULE FIRED: Metabolic Complications");
-end
-
-/* ---- дополнительные, более сложные правила:  ---- */
-
-rule "Hyperglycemia Hidden Risk 1"
-when
-    $p : Patient(highSugar == true, thirst == true, frequentUrination == false)
-then
-    insert(new Conclusion("Высокий уровень глюкозы и жажда без полиурии — возможна скрытая гипергликемия. Проверьте профиль глюкозы."));
-    insert("HYPER");
-    System.out.println("RULE FIRED: Hyperglycemia Hidden Risk 1");
-end
-
-rule "Hyperglycemia Hidden Risk 2"
-when
-    $p : Patient(fatigue == true, highSugar == true, blurredVision == false)
-then
-    insert(new Conclusion("Усталость при высоком сахаре без изменений зрения — обратить внимание на колебания сахара в течение дня."));
-    insert("HYPER");
-    System.out.println("RULE FIRED: Hyperglycemia Hidden Risk 2");
-end
-
-rule "Hyperglycemia Cumulative Risk"
-when
-    $p : Patient(fatigue == true, highSugar == true, frequentUrination == true)
-then
-    insert(new Conclusion("Тройная комбинация симптомов усиливает вероятность выраженной гипергликемии."));
-    insert("HYPER");
-    System.out.println("RULE FIRED: Hyperglycemia Cumulative Risk");
-end
-
-rule "Double Symptom Trigger 1"
-when
-    $p : Patient(fatigue == true, numbness == true)
-then
-    insert(new Conclusion("Усталость в сочетании с онемением — вероятность ухудшения нейропатии, оценить функцию периферических нервов."));
-    insert("COMPL");
-    System.out.println("RULE FIRED: Double Symptom Trigger 1");
-end
-
-rule "Double Symptom Trigger 2"
-when
-    $p : Patient(blurredVision == true, thirst == true)
-then
-    insert(new Conclusion("Нарушение зрения и жажда — возможны острые нарушения обмена веществ, требуется проверка гликемии."));
-    insert("HYPER");
-    System.out.println("RULE FIRED: Double Symptom Trigger 2");
-end
-
-rule "Double Symptom Trigger 3"
-when
-    $p : Patient(highSugar == true, numbness == true)
-then
-    insert(new Conclusion("Высокий сахар в сочетании с нейропатией повышает риск трофических осложнений (язвы)."));
-    insert("COMPL");
-    System.out.println("RULE FIRED: Double Symptom Trigger 3");
-end
-
-rule "BMI Risk 1"
+rule "10. BMI Risk - Thirst"
 when
     $p : Patient(bmi > 32, thirst == true)
 then
     insert(new Conclusion("Высокий BMI и жажда — обращать внимание на метаболический контроль и объем жидкости."));
-    insert("COMPL");
-    System.out.println("RULE FIRED: BMI Risk 1");
+    System.out.println("RULE FIRED: 10. BMI Risk 1");
 end
 
-rule "BMI Risk 2"
+rule "11. BMI Risk - High Sugar"
 when
     $p : Patient(bmi < 20, highSugar == true)
 then
     insert(new Conclusion("Низкий BMI при высоком сахаре может указывать на худеющую форму диабета — рассмотреть аутоиммунный компонент."));
-    insert("HYPER");
-    System.out.println("RULE FIRED: BMI Risk 2");
+    System.out.println("RULE FIRED: 11. BMI Risk 2");
 end
 
-rule "BMI Risk 3"
+rule "12. BMI Risk - Fatique and Numbness"
 when
     $p : Patient(bmi > 28, fatigue == true, numbness == true)
 then
     insert(new Conclusion("Ожирение в сочетании с усталостью и онемением усиливает риск нейропатии и сердечно-сосудистых осложнений."));
-    insert("COMPL");
-    System.out.println("RULE FIRED: BMI Risk 3");
+    System.out.println("RULE FIRED: 12. BMI Risk 3");
 end
 
-rule "Family History Risk 1"
-when
-    $p : Patient(familyHistory == true, thirst == true)
-then
-    insert(new Conclusion("Анамнез диабета по семье в сочетании с жаждой — обратить внимание на режим и самоконтроль."));
-    insert("COMPL");
-    System.out.println("RULE FIRED: Family History Risk 1");
-end
 
-rule "Family History Risk 2"
+rule "13. Hidden Pattern 1"
 when
-    $p : Patient(familyHistory == true, highSugar == true, bmi > 27)
-then
-    insert(new Conclusion("Наследственность с высоким сахаром и весом — сложность в управлении сахаром, целесообразна коррекция терапии."));
-    insert("COMPL");
-    System.out.println("RULE FIRED: Family History Risk 2");
-end
-
-rule "Family History Risk 3"
-when
-    $p : Patient(familyHistory == true, blurredVision == true)
-then
-    insert(new Conclusion("Семейный анамнез с проблемами зрения — усиленный офтальмологический контроль показан."));
-    insert("COMPL");
-    System.out.println("RULE FIRED: Family History Risk 3");
-end
-
-rule "Hidden Pattern 1"
-when
-    $p : Patient(thirst == true, fatigue == true, frequentUrination == false)
+    $p : Patient(
+        thirst == true,
+        fatigue == true,
+        frequentUrination == false
+    )
 then
     insert(new Conclusion("Жажда и усталость без полиурии — возможно нерегулярный прием пищи/колебания глюкозы, рекомендован дневник питания/глюкозы."));
-    insert("HYPER");
-    System.out.println("RULE FIRED: Hidden Pattern 1");
+    System.out.println("RULE FIRED: 13. Hidden Pattern 1");
 end
 
-rule "Hidden Pattern 2"
+rule "14. Hidden Pattern 2"
 when
-    $p : Patient(numbness == true, highSugar == false)
+    $p : Patient(
+        numbness == true,
+        highSugar == false,
+        lowSugar == false
+    )
 then
     insert(new Conclusion("Онемение при нормальном показателе сахара — искать другие причины нейропатии и скрытые периферические нарушения."));
-    insert("COMPL");
-    System.out.println("RULE FIRED: Hidden Pattern 2");
+    System.out.println("RULE FIRED: 14. Hidden Pattern 2");
 end
 
-rule "Hidden Pattern 3"
+
+/* 1 тип сахарного диабета */
+
+rule "15. Basal Insulin Mismatch"
 when
-    $p : Patient(blurredVision == true, highSugar == false)
+    $p : Patient(
+        diabetesType == "Тип 1",
+        nightSweats == true,
+        hunger == true,
+        fatigue == true,
+        skippedMeals == false
+    )
 then
-    insert(new Conclusion("Зрение ухудшается при нормальном сахаре — возможны сосудистые или микрососудистые изменения, направить к офтальмологу."));
-    insert("COMPL");
-    System.out.println("RULE FIRED: Hidden Pattern 3");
+    insert(new Conclusion("Возможна несоответствующая базальная доза инсулина."));
+    System.out.println("RULE FIRED: 15. Basal Insulin Mismatch");
 end
 
-rule "Systemic Risk 1"
+rule "16. Bolus Timing Issue"
 when
-    $p : Patient(fatigue == true, thirst == true, blurredVision == true)
+    $p : Patient(
+        diabetesType == "Тип 1",
+        lateEating == true,
+        blurredVision == true,
+        fatigue == true,
+        thirst == false
+    )
 then
-    insert(new Conclusion("Три одновременных признака указывают на системное нарушение обмена веществ — срочная комплексная оценка."));
-    insert("COMPL");
-    System.out.println("RULE FIRED: Systemic Risk 1");
+    insert(new Conclusion("Вероятна ошибка во времени введения болюсного инсулина."));
+    System.out.println("RULE FIRED: 16. Bolus Timing Issue");
 end
 
-rule "Systemic Risk 2"
+rule "17. Injection Absorption Problem"
 when
-    $p : Patient(highSugar == true, numbness == true, blurredVision == true)
+    $p : Patient(
+        diabetesType == "Тип 1",
+        injectionSiteProblems == true,
+        highSugar == false,
+        fatigue == true,
+        blurredVision == true
+    )
 then
-    insert(new Conclusion("Высокий сахар одновременно с нейропатией и нарушением зрения — высокий риск осложнений, немедленная оценка."));
-    insert("COMPL");
-    System.out.println("RULE FIRED: Systemic Risk 2");
+    insert(new Conclusion("Нарушено всасывание инсулина из-за проблем с местом инъекции."));
+    System.out.println("RULE FIRED: 17. Injection Absorption Problem");
 end
 
-rule "Systemic Risk 3"
+/* Диабет 2 типа */
+
+rule "18. Progressive Insulin Resistance"
 when
-    $p : Patient(frequentUrination == true, blurredVision == true)
+    $p : Patient(
+        diabetesType == "Тип 2",
+        bmi > 30,
+        fatigue == true,
+        slowHealing == true,
+        frequentUrination == false
+    )
 then
-    insert(new Conclusion("Связь полиурии и проблем со зрением может указывать на декомпенсацию диабета — требуется контроль."));
-    insert("HYPER");
-    System.out.println("RULE FIRED: Systemic Risk 3");
+    insert(new Conclusion("Прогрессирующая инсулинорезистентность без классических симптомов."));
+    System.out.println("RULE FIRED: 18. Progressive Insulin Resistance");
 end
 
-rule "Complex Combination 1"
+rule "19. Postprandial Hyperglycemia"
 when
-    $p : Patient(bmi < 22, thirst == true, numbness == true)
+    $p : Patient(
+        diabetesType == "Тип 2",
+        lateEating == true,
+        hunger == true,
+        fatigue == true,
+        thirst == false
+    )
 then
-    insert(new Conclusion("Редкая комбинация: обратить внимание на эндокринные или аутоиммунные причины (рекомендована детальная диагностика)."));
-    insert("COMPL");
-    System.out.println("RULE FIRED: Complex Combination 1");
+    insert(new Conclusion("Вероятна постпрандиальная гипергликемия."));
+    System.out.println("RULE FIRED: 19. Postprandial Hyperglycemia");
 end
 
-rule "Complex Combination 2"
+rule "20. Diet-Induced Glycemic Instability"
 when
-    $p : Patient(bmi > 35, frequentUrination == false, highSugar == true)
+    $p : Patient(
+        diabetesType == "Тип 2",
+        irregularEating == true,
+        rapidHeartbeat == true,
+        confusion == true
+    )
 then
-    insert(new Conclusion("Высокий BMI и высокий сахар без полиурии — скрытая гипергликемия/неправильная гидратация, углубленный контроль показателей."));
-    insert("HYPER");
-    System.out.println("RULE FIRED: Complex Combination 2");
+    insert(new Conclusion("Колебания сахара вызваны нарушением режима питания."));
+    System.out.println("RULE FIRED: 20. Diet-Induced Glycemic Instability");
 end
 
-rule "Complex Combination 3"
+rule "21. Early Neuropathy Without Pain"
 when
-    $p : Patient(fatigue == true, blurredVision == true, familyHistory == true)
+    $p : Patient(
+        numbness == true,
+        neuropathyPain == false,
+        fatigue == true,
+        slowHealing == true
+    )
 then
-    insert(new Conclusion("Сложная комбинация симптомов и наследственности — усиленный мониторинг и междисциплинарная оценка."));
-    insert("COMPL");
-    System.out.println("RULE FIRED: Complex Combination 3");
+    insert(new Conclusion("Ранняя стадия диабетической нейропатии без болевого синдрома."));
+    System.out.println("RULE FIRED: 21. Early Neuropathy Without Pain");
 end
 
-rule "Morning Hyperglycemia Risk"
+rule "22. Autonomic Neuropathy Pattern"
 when
-    $p : Patient(fatigue == true, thirst == true, frequentUrination == true, bmi <= 30)
+    $p : Patient(
+        rapidHeartbeat == true,
+        dizziness == true,
+        sweating == false,
+        hunger == false
+    )
 then
-    insert(new Conclusion("Симптомы указывают на возможное повышение сахара утром (утренняя гипергликемия). Рекомендуется измерить уровень глюкозы утром натощак."));
-    insert("HYPER");
-    System.out.println("RULE FIRED: Morning Hyperglycemia Risk");
+    insert(new Conclusion("Вероятна автономная диабетическая нейропатия."));
+    System.out.println("RULE FIRED: 22. Autonomic Neuropathy Pattern");
 end
 
-/* ----- Гестационный диабет — специальные правила ----- */
-
-rule "Gestational - Insulin Resistance Warning"
+rule "23. Foot Ulcer Risk Without Ulcers"
 when
-    $p : Patient(diabetesType == "Гестационный", bmi > 28, highSugar == true)
+    $p : Patient(
+        numbness == true,
+        slowHealing == true,
+        infections == true,
+        footUlcers == false
+    )
+then
+    insert(new Conclusion("Высокий риск формирования диабетической стопы."));
+    System.out.println("RULE FIRED: 23. Foot Ulcer Risk Without Ulcers");
+end
+
+rule "24. Early Diabetic Nephropathy"
+when
+    $p : Patient(
+        kidneyIssues == false,
+        highBloodPressure == true,
+        nightSweats == true,
+        fatigue == true
+    )
+then
+    insert(new Conclusion("Вероятна ранняя стадия диабетической нефропатии."));
+    System.out.println("RULE FIRED: 24. Early Diabetic Nephropathy");
+end
+
+rule "25. Compensatory Overeating Pattern"
+when
+    $p : Patient(
+        skippedMeals == true,
+        hunger == true,
+        fatigue == true,
+        poorDiet == false
+    )
+then
+    insert(new Conclusion("Компенсаторное переедание как ответ на пропуски пищи."));
+    System.out.println("RULE FIRED: 25. Compensatory Overeating Pattern");
+end
+
+rule "26. Reactive Hypoglycemia"
+when
+    $p : Patient(
+        lateEating == true,
+        rapidHeartbeat == true,
+        sweating == true,
+        confusion == true
+    )
+then
+    insert(new Conclusion("Реактивная гипогликемия после позднего приема пищи."));
+    System.out.println("RULE FIRED: 26. Reactive Hypoglycemia");
+end
+
+rule "27. Pseudo-Hypoglycemia"
+when
+    $p : Patient(
+        dizziness == true,
+        sweating == true,
+        hunger == true,
+        lowSugar == false
+    )
+then
+    insert(new Conclusion("Псевдогипогликемия при резком снижении сахара."));
+    System.out.println("RULE FIRED: 27. Pseudo-Hypoglycemia");
+end
+
+
+rule "28. Hypoglycemia Unawareness"
+when
+    $p : Patient(
+        lowSugar == false,
+        confusion == true,
+        sweating == false,
+        hunger == false
+    )
+then
+    insert(new Conclusion("Потеря распознавания гипогликемии."));
+    System.out.println("RULE FIRED: 28. Hypoglycemia Unawareness");
+end
+
+/* Системные правила */
+
+rule "29. Long-Term Poor Control"
+when
+    $p : Patient(
+        slowHealing == true,
+        infections == true,
+        blurredVision == true,
+        fatigue == true
+    )
+then
+    insert(new Conclusion("Длительно неудовлетворительный контроль диабета."));
+    System.out.println("RULE FIRED: 29. Long-Term Poor Control");
+end
+
+rule "30. Therapy Ineffectiveness"
+when
+    $p : Patient(
+        highSugar == false,
+        lowSugar == false,
+        fatigue == true,
+        weightLoss == true
+    )
+then
+    insert(new Conclusion("Возможная неэффективность текущей терапии."));
+    System.out.println("RULE FIRED: 30. Therapy Ineffectiveness");
+end
+
+/* Гестационный диабет */
+
+rule "31. Placental Insulin Resistance"
+when
+    $p : Patient(
+        diabetesType == "Гестационный",
+        pregnancyWeek > 24,
+        fatigue == true,
+        blurredVision == true,
+        thirst == false
+    )
+then
+    insert(new Conclusion("Вероятно усиление плацентарной инсулинорезистентности."));
+    System.out.println("RULE FIRED: 31. Placental Insulin Resistance");
+end
+
+rule "32. Gestational - Insulin Resistance Warning"
+when
+    $p : Patient(
+        diabetesType == "Гестационный",
+        bmi > 28,
+        highSugar == true
+    )
 then
     insert(new Conclusion("Гестационный диабет с ожирением и высоким сахаром — риск инсулинорезистентности, обсудить режим и наблюдение акушером."));
-    insert("COMPL");
-    System.out.println("RULE FIRED: Gestational - Insulin Resistance Warning");
+    System.out.println("RULE FIRED: 32. Gestational - Insulin Resistance Warning");
 end
 
-rule "Gestational - Fetal Risk Signal"
+rule "33. Gestational - Fetal Risk Signal"
 when
-    $p : Patient(diabetesType == "Гестационный", highSugar == true)
+    $p : Patient(
+        diabetesType == "Гестационный",
+        highSugar == true
+    )
 then
     insert(new Conclusion("Высокий сахар при гестационном диабете повышает риск макросомии плода и осложнений при родах — координировать с акушерством."));
-    insert("COMPL");
-    System.out.println("RULE FIRED: Gestational - Fetal Risk Signal");
+    System.out.println("RULE FIRED: 33. Gestational - Fetal Risk Signal");
 end
 
-rule "Gestational - Hydration Concern"
+rule "34. Gestational - Hydration Concern"
 when
-    $p : Patient(diabetesType == "Гестационный", frequentUrination == true, thirst == true)
+    $p : Patient(
+        diabetesType == "Гестационный",
+        frequentUrination == true,
+        thirst == true
+    )
 then
     insert(new Conclusion("Беременная пациентка может быть дегидратирована — оценить статус жидкости и электролитов."));
-    insert("COMPL");
-    System.out.println("RULE FIRED: Gestational - Hydration Concern");
+    System.out.println("RULE FIRED: 34. Gestational - Hydration Concern");
 end
 
-rule "Gestational - Hypoglycemia Risk"
+rule "35. Gestational - Hypoglycemia Risk"
 when
-    $p : Patient(diabetesType == "Гестационный", fatigue == true, highSugar == false)
+    $p : Patient(
+        diabetesType == "Гестационный",
+        fatigue == true,
+        highSugar == false
+    )
 then
     insert(new Conclusion("У беременной возможна гипогликемия вследствие ограничений в питании или терапии — рекомендован мониторинг."));
-    insert("HYPO");
-    System.out.println("RULE FIRED: Gestational - Hypoglycemia Risk");
+    System.out.println("RULE FIRED: 35. Gestational - Hypoglycemia Risk");
 end
 
-rule "Gestational - Postpartum Monitoring"
+rule "36. Hidden Infection Risk"
 when
-    $p : Patient(diabetesType == "Гестационный", highSugar == false, familyHistory == true)
+    $p : Patient(
+        infections == true,
+        fatigue == true,
+        proteinInUrine == false,
+        highSugar == false
+    )
 then
-    insert(new Conclusion("После родов сохраняется риск развития диабета 2 типа — планировать постнатальное наблюдение."));
-    insert("COMPL");
-    System.out.println("RULE FIRED: Gestational - Postpartum Monitoring");
+    insert(new Conclusion(
+        "Наличие инфекций и усталость без повышенного сахара или протеинурии — возможная скрытая инфекция или иммунный дисбаланс. Рекомендовано обследование и контроль показателей крови."
+    ));
+    System.out.println("RULE FIRED: 36. Hidden Infection Risk in Gestational Diabetes");
 end
 
-rule "Rebound Hyperglycemia (Somogyi Effect)"
+rule "37. Autonomic Neuropathy Early Sign"
 when
-    $p : Patient(highSugar == true, lowSugar == true, fatigue == true)
-then
-    insert(new Conclusion("Высокий сахар утром после эпизодов ночной гипогликемии может указывать на эффект Сомоджи — пересмотрите вечернюю дозу инсулина."));
-    insert("HYPER");
-    System.out.println("RULE FIRED: Rebound Hyperglycemia (Somogyi Effect)");
-end
-
-rule "Autonomic Neuropathy Early Sign"
-when
-    $p : Patient(rapidHeartbeat == true, frequentUrination == false, highSugar == false)
+    $p : Patient(
+        rapidHeartbeat == true,
+        frequentUrination == false,
+        highSugar == false
+    )
 then
     insert(new Conclusion("Учащённый пульс без гипергликемии и полиурии — возможные ранние признаки автономной нейропатии. Рекомендуется проверка вариабельности сердечного ритма."));
-    insert("COMPL");
-    System.out.println("RULE FIRED: Autonomic Neuropathy Early Sign");
+    System.out.println("RULE FIRED: 37. Autonomic Neuropathy Early Sign");
 end
 
-rule "Nocturnal Hypoglycemia Risk"
+rule "38. Possible LADA Pattern"
 when
-    $p : Patient(nightSweats == true, fatigue == true, highSugar == false)
+    $p : Patient(
+        diabetesType == "Тип 2",
+        bmi < 25,
+        weightLoss == true,
+        fatigue == true,
+        highSugar == true
+    )
 then
-    insert(new Conclusion("Ночная потливость и утренняя усталость могут указывать на ночную гипогликемию — рекомендуется ночной мониторинг глюкозы или установка CGM."));
-    insert("HYPO");
-    System.out.println("RULE FIRED: Nocturnal Hypoglycemia Risk");
+    insert(new Conclusion(
+        "Низкий BMI, потеря веса и гипергликемия при формальном диагнозе диабета 2 типа могут указывать на LADA (латентный аутоиммунный диабет взрослых). Рекомендуется обследование на аутоантитела (GAD, IA-2) и пересмотр терапии."
+    ));
+    System.out.println("RULE FIRED: 38. Possible LADA Pattern");
+end
+
+rule "39. Preeclampsia Pattern"
+when
+    $p : Patient(
+        diabetesType == "Гестационный",
+        proteinInUrine == true,
+        highBloodPressure == true,
+        fetalGrowthIssues == true
+    )
+then
+    insert(new Conclusion("Комбинация протеинурии, нарушений роста плода и гипертензии соответствует клинической картине преэклампсии на фоне гестационного диабета."));
+    System.out.println("RULE FIRED: 39. Preeclampsia Pattern");
+end
+
+rule "40. Preterm Delivery Risk"
+when
+    $p : Patient(
+        diabetesType == "Гестационный",
+        pregnancyWeek < 37,
+        fetalGrowthIssues == true,
+        proteinInUrine == true
+    )
+then
+    insert(new Conclusion("Сочетание осложнений повышает риск преждевременного родоразрешения. Требуется госпитализация и наблюдение."));
+    System.out.println("RULE FIRED: 40. Preterm Delivery Risk");
 end
